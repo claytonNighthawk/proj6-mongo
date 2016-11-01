@@ -18,7 +18,7 @@ in it:
 
 - secrets/admin_secrets.py holds configuration information for your MongoDB
   database, including the administrative password.  
-= secrets/client_secrets.py holds configuration information for your
+- secrets/client_secrets.py holds configuration information for your
   application. 
 
 
