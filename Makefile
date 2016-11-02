@@ -1,23 +1,21 @@
-#
-# Project 6: Memos of Mongo
-#
 # Gnu make and bash are required. 
 #
 # To run from source: 
 #    bash ./configure
 #    make run 
 # 
-#  'make configure' is no longer supported.  Type "bash configure" 
-#  or ". configure" or "source configure" instead (this may depend on 
-#  your environment.
-
+#  'make configure' may also work, but with error
+#   messages.
 
 # Many recipes need to be run in the virtual environment, 
 # so run them as $(INVENV) command
+
+#Reverted to make style of past projects because the new style just wasnt working for me for automated install at all
+
 INVENV = . env/bin/activate ;
 
 Makefile.local: 
-	echo "You must run the 'configure' script before using make"
+	bash ./configure
 
 include Makefile.local  ## Where customizations go 
 

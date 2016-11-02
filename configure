@@ -7,5 +7,4 @@ echo "Selecting configuration file ..."
 (cd targets.d; ./choose_config.sh)
 
 echo "Installing virtual environment with required Python packages"
-echo "If this fails, fix Makefile.local and try 'make env'"
 make env
