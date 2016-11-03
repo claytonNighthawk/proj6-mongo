@@ -32,10 +32,20 @@ env:
 run:	env
 	($(INVENV) python3 flask_main.py) ||  true
 
+## creates the database, only needs to be ran once
+
+create:	env
+	($(INVENV) python3 create_db.py) ||  true
+
 ## for testing the trial db
 
-dbtrial:	env
+trial:	env
 	($(INVENV) python3 db_trial.py) ||  true
+
+## destroys database if necessary
+
+destroy:	env
+	($(INVENV) python3 destroy_db.py) ||  true
 
 # 'make service' runs as a background job under the gunicorn 
 #  WSGI server. FIXME:  A real production service would use 

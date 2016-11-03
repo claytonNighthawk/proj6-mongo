@@ -72,11 +72,18 @@ def index():
   return flask.render_template('index.html')
 
 
-# We don't have an interface for creating memos yet
-# @app.route("/create")
-# def create():
-#     app.logger.debug("Create")
-#     return flask.render_template('create.html')
+@app.route("/create")
+def create():
+    app.logger.debug("Create Page")
+    return flask.render_template('create.html')
+
+
+@app.route("/_submit", methods=["POST"])
+def submit():
+    app.logger.debug("Create Memo")
+    text = request.form["memo"]
+    app.logger.debug(text)
+    return flask.render_template('index.html')
 
 
 @app.errorhandler(404)
