@@ -27,14 +27,14 @@ import arrow    # Replacement for datetime, based on moment.js
 from dateutil import tz  # For interpreting local times
 
 # Mongo database
-from pymongo import MongoClient
-import secrets.admin_secrets
-import secrets.client_secrets
-MONGO_CLIENT_URL = "mongodb://{}:{}@localhost:{}/{}".format(
-    secrets.client_secrets.db_user,
-    secrets.client_secrets.db_user_pw,
-    secrets.admin_secrets.port, 
-    secrets.client_secrets.db)
+# from pymongo import MongoClient
+# import secrets.admin_secrets
+# import secrets.client_secrets
+# MONGO_CLIENT_URL = "mongodb://{}:{}@localhost:{}/{}".format(
+#     secrets.client_secrets.db_user,
+#     secrets.client_secrets.db_user_pw,
+#     secrets.admin_secrets.port, 
+#     secrets.client_secrets.db)
 
 ###
 # Globals
@@ -47,14 +47,14 @@ app.secret_key = CONFIG.secret_key
 # Database connection per server process
 ###
 
-try: 
-    dbclient = MongoClient(MONGO_CLIENT_URL)
-    db = getattr(dbclient, secrets.client_secrets.db)
-    collection = db.dated
+# try: 
+#     dbclient = MongoClient(MONGO_CLIENT_URL)
+#     db = getattr(dbclient, secrets.client_secrets.db)
+#     collection = db.dated
 
-except:
-    print("Failure opening database.  Is Mongo running? Correct password?")
-    sys.exit(1)
+# except:
+#     print("Failure opening database.  Is Mongo running? Correct password?")
+#     sys.exit(1)
 
 
 
@@ -66,9 +66,9 @@ except:
 @app.route("/index")
 def index():
   app.logger.debug("Main page entry")
-  g.memos = get_memos()
-  for memo in g.memos: 
-      app.logger.debug("Memo: " + str(memo))
+  # g.memos = get_memos()
+  # for memo in g.memos: 
+  #     app.logger.debug("Memo: " + str(memo))
   return flask.render_template('index.html')
 
 
@@ -82,7 +82,12 @@ def create():
 def submit():
     app.logger.debug("Create Memo")
     text = request.form["memo"]
-    app.logger.debug(text)
+    date = arrow.get(request.form["date"]).isoformat()
+    memo = { "type": "dated_memo", 
+           "date":  date,
+           "text": text,
+          }
+    app.logger.debug(memo)
     return flask.render_template('index.html')
 
 
@@ -105,7 +110,7 @@ def humanize_arrow_date( date ):
     """
     Date is internal UTC ISO format string.
     Output should be "today", "yesterday", "in 5 days", etc.
-    Arrow will try to humanize down to the minute, so we
+    Arrow will try to humanize down to the hour, so we
     need to catch 'today' as a special case. 
     """
     try:
