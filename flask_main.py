@@ -27,14 +27,15 @@ import arrow    # Replacement for datetime, based on moment.js
 from dateutil import tz  # For interpreting local times
 
 # Mongo database
-# from pymongo import MongoClient
-# import secrets.admin_secrets
-# import secrets.client_secrets
-# MONGO_CLIENT_URL = "mongodb://{}:{}@localhost:{}/{}".format(
-#     secrets.client_secrets.db_user,
-#     secrets.client_secrets.db_user_pw,
-#     secrets.admin_secrets.port, 
-#     secrets.client_secrets.db)
+import pymongo
+from pymongo import MongoClient
+import secrets.admin_secrets
+import secrets.client_secrets
+MONGO_CLIENT_URL = "mongodb://{}:{}@localhost:{}/{}".format(
+    secrets.client_secrets.db_user,
+    secrets.client_secrets.db_user_pw,
+    secrets.admin_secrets.port, 
+    secrets.client_secrets.db)
 
 ###
 # Globals
@@ -47,14 +48,14 @@ app.secret_key = CONFIG.secret_key
 # Database connection per server process
 ###
 
-# try: 
-#     dbclient = MongoClient(MONGO_CLIENT_URL)
-#     db = getattr(dbclient, secrets.client_secrets.db)
-#     collection = db.dated
+try: 
+    dbclient = MongoClient(MONGO_CLIENT_URL)
+    db = getattr(dbclient, secrets.client_secrets.db)
+    collection = db.dated
 
-# except:
-#     print("Failure opening database.  Is Mongo running? Correct password?")
-#     sys.exit(1)
+except:
+    print("Failure opening database.  Is Mongo running? Correct password?")
+    sys.exit(1)
 
 
 
@@ -66,9 +67,9 @@ app.secret_key = CONFIG.secret_key
 @app.route("/index")
 def index():
   app.logger.debug("Main page entry")
-  # g.memos = get_memos()
-  # for memo in g.memos: 
-  #     app.logger.debug("Memo: " + str(memo))
+  g.memos = get_memos()
+  for memo in g.memos: 
+      app.logger.debug("Memo: " + str(memo))
   return flask.render_template('index.html')
 
 
@@ -88,7 +89,8 @@ def submit():
            "text": text,
           }
     app.logger.debug(memo)
-    return flask.render_template('index.html')
+    collection.insert(memo)
+    return flask.render_template('create.html')
 
 
 @app.errorhandler(404)
@@ -114,10 +116,15 @@ def humanize_arrow_date( date ):
     need to catch 'today' as a special case. 
     """
     try:
-        then = arrow.get(date).to('local')
-        now = arrow.utcnow().to('local')
+        then = arrow.get(date).replace(tzinfo='local')
+        now = arrow.now()
+        yester_then = then.replace(days=+1)
+        print(then, now)
+
         if then.date() == now.date():
             human = "Today"
+        elif yester_then.date() == now.date():
+            human = "Yesterday"
         else: 
             human = then.humanize(now)
             if human == "in a day":
@@ -138,7 +145,8 @@ def get_memos():
     can be inserted directly in the 'session' object.
     """
     records = [ ]
-    for record in collection.find( { "type": "dated_memo" } ):
+    for record in collection.find({"type": "dated_memo"}).sort("date", -1):
+
         record['date'] = arrow.get(record['date']).isoformat()
         del record['_id']
         records.append(record)
