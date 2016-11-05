@@ -58,7 +58,6 @@ except:
     sys.exit(1)
 
 
-
 ###
 # Pages
 ###
@@ -81,17 +80,29 @@ def create():
 
 @app.route("/_submit", methods=["POST"])
 def submit():
-    app.logger.debug("Create Memo")
+    app.logger.debug("Creating Memo")
     text = request.form["memo"]
     date = arrow.get(request.form["date"]).isoformat()
     memo = { "type": "dated_memo", 
            "date":  date,
-           "text": text,
-          }
+           "text": text}
+
     app.logger.debug(memo)
     collection.insert(memo)
     return flask.render_template('create.html')
 
+@app.route("/_delete_memo", methods=["POST"])
+def delete_memo():
+    app.logger.debug("Deleting Memo")
+    memo_d_t = request.form["to_delete"].split(",")
+    date = memo_d_t[0]
+    text = memo_d_t[1]
+    app.logger.debug(memo_d_t)
+    collection.delete_one({"date": date, "text": text})
+    g.memos = get_memos()
+    for memo in g.memos: 
+      app.logger.debug("Memo: " + str(memo))
+    return flask.render_template("index.html")
 
 @app.errorhandler(404)
 def page_not_found(error):
@@ -117,18 +128,17 @@ def humanize_arrow_date( date ):
     """
     try:
         then = arrow.get(date).replace(tzinfo='local')
-        now = arrow.now()
-        yester_then = then.replace(days=+1)
-        print(then, now)
+        now = arrow.now().floor('day')
 
         if then.date() == now.date():
             human = "Today"
-        elif yester_then.date() == now.date():
-            human = "Yesterday"
+        elif now.replace(days=+1).date() == then.date():
+            human = "Tomorrow"
+        elif now.replace(days=-1).date() == then.date():
+            human = "Yesterday"    
         else: 
             human = then.humanize(now)
-            if human == "in a day":
-                human = "Tomorrow"
+
     except: 
         human = date
     return human
@@ -157,5 +167,3 @@ if __name__ == "__main__":
     app.debug=CONFIG.DEBUG
     app.logger.setLevel(logging.DEBUG)
     app.run(port=CONFIG.PORT,host="0.0.0.0")
-
-    

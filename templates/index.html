@@ -38,19 +38,24 @@
 
 <h1>Memos</h1>
 
+<a href="/create">Create New Memo</a>
+<br>
+<br>
+
 {% if g.memos %}
     {% for memo in g.memos %}
   <div class="memo">
   <div class="row">
-  <div class="checkbox">
-    <form method="POST" action="/_delete_memos">
-      <input type="checkbox" name="deleteEntry">
+  <div class="col-md-2">
+    <form id="button" method="POST" action="/_delete_memo">
+      <button type="submit" name="to_delete"  value="{{memo.date + ',' + memo.text}}">Delete</button>
+      
     </form>
   </div>
-  <div class="col-md-2">
+  <div class="col-md-4">
     {{ memo.date | humanize }}
   </div>
-  <div class="col-md-10">
+  <div class="col-md-14">
     {{ memo.text }}
   </div>
   </div> <!-- row -->
@@ -61,8 +66,6 @@
 {% endif %}
 
 <br>
-<a href="/create">Create New Memo</a>
-<!-- <input type="submit" value="Delete Selected Memos"> -->
 
 </div> <!-- container -->
 </body>
