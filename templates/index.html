@@ -38,7 +38,7 @@
 
 <h1>Memos</h1>
 
-<a href="/create">Create New Memo</a>
+<a href="/create">Create New Memo</a> 
 <br>
 <br>
 
@@ -48,24 +48,25 @@
   <div class="row">
   <div class="col-md-2">
     <form id="button" method="POST" action="/_delete_memo">
-      <button type="submit" name="to_delete"  value="{{memo.date + ',' + memo.text}}">Delete</button>
-      
+      <button type="submit" name="to_delete"  value="{{memo.date + ',' + memo.text}}">Delete</button>   
     </form>
   </div>
-  <div class="col-md-4">
+  <div class="col-md-2">
     {{ memo.date | humanize }}
   </div>
-  <div class="col-md-14">
+  <br>
+  <br>
+  <div class="col-md-10">
     {{ memo.text }}
   </div>
+  <br>
+  <br>
   </div> <!-- row -->
   </div> <!-- memo -->
   {% endfor %}
 {% else %}
   <p>No memos for you. </p>  
 {% endif %}
-
-<br>
 
 </div> <!-- container -->
 </body>

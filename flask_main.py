@@ -40,6 +40,7 @@ MONGO_CLIENT_URL = "mongodb://{}:{}@localhost:{}/{}".format(
 ###
 # Globals
 ###
+from human import *
 import CONFIG
 app = flask.Flask(__name__)
 app.secret_key = CONFIG.secret_key
@@ -126,22 +127,8 @@ def humanize_arrow_date( date ):
     Arrow will try to humanize down to the hour, so we
     need to catch 'today' as a special case. 
     """
-    try:
-        then = arrow.get(date).replace(tzinfo='local')
-        now = arrow.now().floor('day')
-
-        if then.date() == now.date():
-            human = "Today"
-        elif now.replace(days=+1).date() == then.date():
-            human = "Tomorrow"
-        elif now.replace(days=-1).date() == then.date():
-            human = "Yesterday"    
-        else: 
-            human = then.humanize(now)
-
-    except: 
-        human = date
-    return human
+    
+    return human(date)
 
 
 #############
