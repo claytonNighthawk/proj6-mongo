@@ -40,7 +40,7 @@ MONGO_CLIENT_URL = "mongodb://{}:{}@localhost:{}/{}".format(
 ###
 # Globals
 ###
-from human import *
+from human import human
 import CONFIG
 app = flask.Flask(__name__)
 app.secret_key = CONFIG.secret_key
